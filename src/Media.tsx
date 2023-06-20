@@ -355,43 +355,35 @@ export function createMedia<
       children?: React.ReactNode
     }
   > = ({ disableDynamicMediaQueries, onlyMatch, children }) => {
-    if (disableDynamicMediaQueries) {
-      const MediaContextValue = getMediaContextValue(onlyMatch)
+    return (
+      <DynamicResponsive.Provider
+        mediaQueries={mediaQueries.dynamicResponsiveMediaQueries}
+        initialMatchingMediaQueries={intersection(
+          mediaQueries.mediaQueryTypes,
+          onlyMatch
+        )}
+      >
+        <DynamicResponsive.Consumer>
+          {matches => {
+            const matchingMediaQueries = Object.keys(matches).filter(
+              key => matches[key]
+            )
 
-      return (
-        <MediaContext.Provider value={MediaContextValue}>
-          {children}
-        </MediaContext.Provider>
-      )
-    } else {
-      return (
-        <DynamicResponsive.Provider
-          mediaQueries={mediaQueries.dynamicResponsiveMediaQueries}
-          initialMatchingMediaQueries={intersection(
-            mediaQueries.mediaQueryTypes,
-            onlyMatch
-          )}
-        >
-          <DynamicResponsive.Consumer>
-            {matches => {
-              const matchingMediaQueries = Object.keys(matches).filter(
-                key => matches[key]
-              )
+            const MediaContextValue = disableDynamicMediaQueries
+              ? getMediaContextValue(onlyMatch)
+              : getMediaContextValue(
+                  intersection(matchingMediaQueries, onlyMatch)
+                )
 
-              const MediaContextValue = getMediaContextValue(
-                intersection(matchingMediaQueries, onlyMatch)
-              )
-
-              return (
-                <MediaContext.Provider value={MediaContextValue}>
-                  {children}
-                </MediaContext.Provider>
-              )
-            }}
-          </DynamicResponsive.Consumer>
-        </DynamicResponsive.Provider>
-      )
-    }
+            return (
+              <MediaContext.Provider value={MediaContextValue}>
+                {children}
+              </MediaContext.Provider>
+            )
+          }}
+        </DynamicResponsive.Consumer>
+      </DynamicResponsive.Provider>
+    )
   }
 
   const Media = class extends React.Component<

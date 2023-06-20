@@ -92,9 +92,10 @@
   },
   "lint-staged": {
     "*.@(ts|tsx)": [
-      "tslint -c tslint.json --fix",
+      "tslint --exclude '**/*.d.ts' -c tslint.json --fix",
+      "yarn compile",
       "yarn prettier-write --",
-      "git add"
+      "git add ."
     ]
   },
   "prettier": {
